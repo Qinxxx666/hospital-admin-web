@@ -16,11 +16,16 @@ const defaultRouterList = [
     name: 'login',
     component: () => import('@/pages/login/index.vue'),
   },
+  // 重定向根路径到登录页
   {
-    path: '*',
+    path: '/',
     redirect: '/dashboard/base',
   },
-  ...asyncRouterList,
+  // 其他不需要认证的公开路由可以放在这里
+  // ...其他公开路由
+
+  // 然后是可能需要认证的路由
+  ...asyncRouterList, // 假设 asyncRouterList 包含需要认证的路由
 ];
 
 const createRouter = () =>

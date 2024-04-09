@@ -1,11 +1,11 @@
 <template>
   <div class="login-wrapper">
-    <login-header />
+<!--    <login-header />-->
 
     <div class="login-container">
       <div class="title-container">
         <h1 class="title margin-no">登录到</h1>
-        <h1 class="title">TDesign Starter</h1>
+        <h1 class="title">医疗管理系统</h1>
         <div class="sub-title">
           <p class="tip">{{ type == 'register' ? '已有账号?' : '没有账号吗?' }}</p>
           <p class="tip" @click="switchType(type == 'register' ? 'login' : 'register')">
@@ -25,13 +25,12 @@
 <script>
 import Login from './components/components-login.vue';
 import Register from './components/components-register.vue';
-import LoginHeader from './components/components-header.vue';
 import TdesignSetting from '@/layouts/setting.vue';
 
 export default {
   name: 'LoginIndex',
   components: {
-    LoginHeader,
+    // LoginHeader,
     Login,
     Register,
     TdesignSetting,

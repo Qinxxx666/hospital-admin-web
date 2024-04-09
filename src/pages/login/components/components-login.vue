@@ -9,7 +9,7 @@
   >
     <template v-if="type == 'password'">
       <t-form-item name="account">
-        <t-input v-model="formData.account" size="large" placeholder="请输入账号：admin">
+        <t-input v-model="formData.account" size="large" placeholder="请输入账号">
           <template #prefix-icon>
             <user-icon />
           </template>
@@ -23,7 +23,7 @@
           :type="showPsw ? 'text' : 'password'"
           clearable
           key="password"
-          placeholder="请输入登录密码：admin"
+          placeholder="请输入登录密码"
         >
           <template #prefix-icon>
             <lock-on-icon />
@@ -77,7 +77,7 @@
 
     <div class="switch-container">
       <span v-if="type !== 'password'" class="tip" @click="switchType('password')">使用账号密码登录</span>
-      <span v-if="type !== 'qrcode'" class="tip" @click="switchType('qrcode')">使用微信扫码登录</span>
+<!--      <span v-if="type !== 'qrcode'" class="tip" @click="switchType('qrcode')">使用微信扫码登录</span>-->
       <span v-if="type !== 'phone'" class="tip" @click="switchType('phone')">使用手机号登录</span>
     </div>
   </t-form>
