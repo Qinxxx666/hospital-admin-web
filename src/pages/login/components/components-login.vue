@@ -135,7 +135,7 @@ export default Vue.extend({
         await this.$store.dispatch('user/login', this.formData);
 
         this.$message.success('登录成功');
-        this.$router.replace('/').catch(() => '');
+        this.$router.replace('/dashboard/base/').catch(() => '');
       }
     },
     handleCounter() {
