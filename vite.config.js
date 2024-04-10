@@ -46,6 +46,17 @@ export default ({ mode }) => {
       host: '0.0.0.0',
       port: 3001,
       proxy: {
+        //'/user':"https//localhost:8080/user",
+        '/user': {
+          target: 'http://127.0.0.1:8080/',
+          ws: true,
+          changeOrigin: true
+        },
+        '/role': {
+          target: 'http://127.0.0.1:8080/',
+          ws: true,
+          changeOrigin: true
+        },
         '/api': {
           // 用于开发环境下的转发请求
           // 更多请参考：https://vitejs.dev/config/#server-proxy

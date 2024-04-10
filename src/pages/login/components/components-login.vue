@@ -72,7 +72,8 @@
     </template>
 
     <t-form-item v-if="type !== 'qrcode'" class="btn-container">
-      <t-button block size="large" type="submit"> 登录 </t-button>
+      <t-button @click="requestGet"
+                block size="large" type="submit"> 登录 </t-button>
     </t-form-item>
 
     <div class="switch-container">
@@ -86,6 +87,7 @@
 import Vue from 'vue';
 import QrcodeVue from 'qrcode.vue';
 import { UserIcon, LockOnIcon, BrowseOffIcon, BrowseIcon, RefreshIcon } from 'tdesign-icons-vue';
+import axios from "axios";
 
 const INITIAL_DATA = {
   phone: '',
@@ -101,6 +103,7 @@ const FORM_RULES = {
   password: [{ required: true, message: '密码必填', type: 'error' }],
   verifyCode: [{ required: true, message: '验证码必填', type: 'error' }],
 };
+
 /** 高级详情 */
 export default Vue.extend({
   name: 'Login',
@@ -126,6 +129,29 @@ export default Vue.extend({
     clearInterval(this.intervalTimer);
   },
   methods: {
+    requestPost() {
+      // axios发起post请求，并携带post参数name
+      axios
+        .post("/api/Test/index", { name: "anbin" })
+        .then((res) => {
+          console.log("post类型请求", res.data.data[0]);
+          this.$refs.post.innerHTML = JSON.stringify(res.data.data);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+    requestGet() {
+      // axios发起get请求，不携带参数,此处是get请求简写，完整写法为 axios.get("/index/index/getData")
+      axios("/user/getUserList")
+        .then((res) => {
+          console.log("get类型请求", res.data);
+          this.$refs.get.innerHTML = JSON.stringify(res.data);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
     switchType(val) {
       this.type = val;
       this.$refs.form.reset();
