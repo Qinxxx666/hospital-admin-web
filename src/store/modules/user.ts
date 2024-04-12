@@ -35,21 +35,30 @@ const actions = {
     const mockLogin = async (userInfo) => {
       // 登录请求流程
       const {account, password} = userInfo;
-      const res = await instance.request({
-        method: 'post',
-        url: '/user/login',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        data: {
-          userName: account,
-          password: password
+      try {
+        const res = await instance.request({
+          method: 'post',
+          url: '/user/login',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': state.token
+          },
+          data: {
+            userName: account,
+            password: password
+          },
+          timeout: 3000
+        })
+        return {
+          code: res.data.code,
+          message: res.data.msg,
+          data: res.data.data,
         }
-      })
-      return {
-        code: res.data.code,
-        message: res.data.msg,
-        data: res.data.data,
+      }catch (error) {
+        return {
+          code: error.code,
+          message: error.message
+        }
       }
     };
     const res = await mockLogin(userInfo);
@@ -77,7 +86,7 @@ const actions = {
     commit('setUserInfo', res);
   },
   async logout({commit}) {
-    commit('removeToken');
+   // commit('removeToken');
     commit('setUserInfo', InitUserInfo);
   },
 };
