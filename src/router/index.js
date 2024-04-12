@@ -23,7 +23,10 @@ const defaultRouterList = [
   },
   // 其他不需要认证的公开路由可以放在这里
   // ...其他公开路由
-
+  {
+    path: '/hospital',
+    redirect: '/hospital/roleManage',
+  },
   // 然后是可能需要认证的路由
   ...asyncRouterList, // 假设 asyncRouterList 包含需要认证的路由
 ];

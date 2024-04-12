@@ -3,6 +3,21 @@ import Layout from '@/layouts/index.vue';
 
 export default [
   {
+    path: '/hospital',
+    name: 'hospital',
+    component: Layout,
+    redirect: '/hospital/roleManage',
+    meta: { title: '医院管理', icon: ViewModuleIcon },
+    children: [
+      {
+        path: 'roleManage',
+        name: 'RoleManage',
+        component: () => import('@/pages/hospital/roleManage/index.vue'),
+        meta: { title: '角色管理页' },
+      },
+    ],
+  },
+  {
     path: '/list',
     name: 'list',
     component: Layout,
