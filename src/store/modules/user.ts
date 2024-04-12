@@ -1,4 +1,5 @@
-import { TOKEN_NAME } from '@/config/global';
+import {TOKEN_NAME} from '@/config/global';
+import instance from '@/utils/request';
 
 const InitUserInfo = {
   roles: [],
@@ -6,7 +7,7 @@ const InitUserInfo = {
 
 // 定义的state初始值
 const state = {
-  token: localStorage.getItem(TOKEN_NAME) || 'main_token', // 默认token不走权限
+  token: localStorage.getItem(TOKEN_NAME), // 默认token不走权限
   userInfo: InitUserInfo,
 };
 
@@ -30,42 +31,34 @@ const getters = {
 };
 
 const actions = {
-  async login({ commit }, userInfo) {
+  async login({commit}, userInfo) {
     const mockLogin = async (userInfo) => {
       // 登录请求流程
-      console.log(userInfo);
-      // const { account, password } = userInfo;
-      // if (account !== 'td') {
-      //   return {
-      //     code: 401,
-      //     message: '账号不存在',
-      //   };
-      // }
-      // if (['main_', 'dev_'].indexOf(password) === -1) {
-      //   return {
-      //     code: 401,
-      //     message: '密码错误',
-      //   };
-      // }
-      // const token = {
-      //   main_: 'main_token',
-      //   dev_: 'dev_token',
-      // }[password];
+      const {account, password} = userInfo;
+      const res = await instance.request({
+        method: 'post',
+        url: '/user/login',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: {
+          userName: account,
+          password: password
+        }
+      })
       return {
-        code: 200,
-        message: '登陆成功',
-        data: 'main_token',
-      };
+        code: res.data.code,
+        message: res.data.msg,
+        data: res.data.data,
+      }
     };
-
     const res = await mockLogin(userInfo);
     if (res.code === 200) {
       commit('setToken', res.data);
-    } else {
-      throw res;
     }
+    return res;
   },
-  async getUserInfo({ commit, state }) {
+  async getUserInfo({commit, state}) {
     const mockRemoteUserInfo = async (token) => {
       if (token === 'main_token') {
         return {
@@ -83,7 +76,7 @@ const actions = {
 
     commit('setUserInfo', res);
   },
-  async logout({ commit }) {
+  async logout({commit}) {
     commit('removeToken');
     commit('setUserInfo', InitUserInfo);
   },

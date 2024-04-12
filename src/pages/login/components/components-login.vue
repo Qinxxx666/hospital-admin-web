@@ -11,7 +11,7 @@
       <t-form-item name="account">
         <t-input v-model="formData.account" size="large" placeholder="请输入账号">
           <template #prefix-icon>
-            <user-icon />
+            <user-icon/>
           </template>
         </t-input>
       </t-form-item>
@@ -91,8 +91,8 @@ import axios from "axios";
 
 const INITIAL_DATA = {
   phone: '',
-  account: 'admin',
-  password: 'admin',
+  account: '',
+  password: '',
   verifyCode: '',
   checked: false,
 };
@@ -158,8 +158,12 @@ export default Vue.extend({
     },
     async onSubmit({ validateResult }) {
       if (validateResult === true) {
-        await this.$store.dispatch('user/login', this.formData);
-
+        const  res = await this.$store.dispatch('user/login', this.formData);
+        if (res.code !== 200)
+        {
+          this.$message.warning(res.message);
+          return;
+        }
         this.$message.success('登录成功');
         this.$router.replace('/dashboard/base/').catch(() => '');
       }

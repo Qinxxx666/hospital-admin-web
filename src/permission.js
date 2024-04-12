@@ -12,6 +12,7 @@ router.beforeEach(async (to, from, next) => {
   NProgress.start();
 
   const token = store.getters['user/token'];
+  console.log("token:",token)
 
   if (token) {
     if (to.path === '/login') {
