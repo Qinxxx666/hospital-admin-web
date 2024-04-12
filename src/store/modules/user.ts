@@ -77,10 +77,9 @@ const actions = {
       }
       return {
         name: 'td_dev',
-        roles: ['UserIndex', 'DashboardBase', 'login'],
+        roles: ['ALL_ROUTERS'],
       };
     };
-
     const res = await mockRemoteUserInfo(state.token);
 
     commit('setUserInfo', res);
