@@ -1,5 +1,5 @@
 import {TOKEN_NAME} from '@/config/global';
-import instance from '@/utils/request';
+import request from '@/utils/request';
 
 const InitUserInfo = {
   roles: [],
@@ -36,7 +36,7 @@ const actions = {
       // 登录请求流程
       const {account, password} = userInfo;
       try {
-        const res = await instance.request({
+        const res = await request.request({
           method: 'post',
           url: '/user/login',
           headers: {
@@ -85,9 +85,30 @@ const actions = {
     commit('setUserInfo', res);
   },
   async logout({commit}) {
-   // commit('removeToken');
     commit('setUserInfo', InitUserInfo);
   },
+  async checkTokenExpiration({commit}, token) {
+    const res = await request.request({
+      method: "get",
+      url: "/user/verify",
+      headers: {
+        'Authorization': token
+      }
+    });
+    if (res.data.code === 200) {
+      console.log(res.data.msg)
+      return true;
+    }
+    if (res.data.code === 403) {
+      commit('removeToken')
+      return false;
+    }
+    if (res.data.code === 401) {
+      commit('removeToken')
+      return false;
+    }
+    return false;
+  }
 };
 
 export default {

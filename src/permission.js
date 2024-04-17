@@ -12,36 +12,14 @@ const whiteListRouters = store.getters['permission/whiteListRouters'];
 router.beforeEach(async (to, from, next) => {
   NProgress.start();
 
-  async function checkTokenExpiration(token) {
-    const res = await request.request({
-      method: "get",
-      url: "/user/verify",
-      headers: {
-        'Authorization': token
-      }
-    });
-    console.log(res.data.code)
-    if (res.data.code === 200) {
-      console.log(res.data.msg)
-      return true;
-    }
-    if (res.data.code === 403) {
-      console.log(res.data.msg)
-      return false;
-    }
-    if (res.data.code === 401) {
-      console.log(res.data.msg)
-      return false;
-    }
-  }
+
 
   const token = store.getters['user/token'];
 
   if (token) {
-    if (!await checkTokenExpiration(token))
+    const res = await store.dispatch('user/checkTokenExpiration', token);
+    if (!res)
     {
-      await store.commit('user/removeToken');
-
       next(`/login?redirect=${to.path}`);
       return;
     }
