@@ -3,6 +3,7 @@ import 'nprogress/nprogress.css'; // progress bar style
 
 import store from '@/store';
 import router from '@/router';
+import request from "@/utils/request";
 
 NProgress.configure({ showSpinner: false });
 
@@ -11,10 +12,39 @@ const whiteListRouters = store.getters['permission/whiteListRouters'];
 router.beforeEach(async (to, from, next) => {
   NProgress.start();
 
+  async function checkTokenExpiration(token) {
+    const res = await request.request({
+      method: "get",
+      url: "/user/verify",
+      headers: {
+        'Authorization': token
+      }
+    });
+    console.log(res.data.code)
+    if (res.data.code === 200) {
+      console.log(res.data.msg)
+      return true;
+    }
+    if (res.data.code === 403) {
+      console.log(res.data.msg)
+      return false;
+    }
+    if (res.data.code === 401) {
+      console.log(res.data.msg)
+      return false;
+    }
+  }
+
   const token = store.getters['user/token'];
-  console.log("token:",token)
 
   if (token) {
+    if (!await checkTokenExpiration(token))
+    {
+      await store.commit('user/removeToken');
+
+      next(`/login?redirect=${to.path}`);
+      return;
+    }
     if (to.path === '/login') {
       setTimeout(() => {
         store.dispatch('user/logout');

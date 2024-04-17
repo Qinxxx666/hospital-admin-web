@@ -15,6 +15,9 @@ const defaultRouterList = [
     path: '/login',
     name: 'login',
     component: () => import('@/pages/login/index.vue'),
+    meta: {
+      title: '登录'
+    }
   },
   // 重定向根路径到登录页
   {

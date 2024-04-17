@@ -72,8 +72,11 @@
     </template>
 
     <t-form-item v-if="type !== 'qrcode'" class="btn-container">
-      <t-button @click="requestGet"
+      <t-button
                 block size="large" type="submit"> 登录 </t-button>
+
+      <t-button @click="requestGet"
+                block size="large"> 获取用户信息 </t-button>
     </t-form-item>
 
     <div class="switch-container">
@@ -88,6 +91,7 @@ import Vue from 'vue';
 import QrcodeVue from 'qrcode.vue';
 import { UserIcon, LockOnIcon, BrowseOffIcon, BrowseIcon, RefreshIcon } from 'tdesign-icons-vue';
 import axios from "axios";
+import {TOKEN_NAME} from "@/config/global";
 
 const INITIAL_DATA = {
   phone: '',
@@ -129,26 +133,39 @@ export default Vue.extend({
     clearInterval(this.intervalTimer);
   },
   methods: {
-    requestPost() {
-      // axios发起post请求，并携带post参数name
-      axios
-        .post("/api/Test/index", { name: "anbin" })
-        .then((res) => {
-          console.log("post类型请求", res.data.data[0]);
-          this.$refs.post.innerHTML = JSON.stringify(res.data.data);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    },
+    // requestPost() {
+    //   // axios发起post请求，并携带post参数name
+    //   axios
+    //     .post("/api/Test/index", { name: "anbin" })
+    //     .then((res) => {
+    //       console.log("post类型请求", res.data.data[0]);
+    //       this.$refs.post.innerHTML = JSON.stringify(res.data.data);
+    //     })
+    //     .catch((err) => {
+    //       console.error(err);
+    //     });
+    // },
     requestGet() {
       // axios发起get请求，不携带参数,此处是get请求简写，完整写法为 axios.get("/index/index/getData")
-      axios("/user/getUserList")
+      axios({
+        method: "get",
+        url: "/user/getUserList",
+        headers: {
+          'Authorization': localStorage.getItem(TOKEN_NAME)
+        }
+      })
         .then((res) => {
-          console.log("get类型请求", res.data);
-          this.$refs.get.innerHTML = JSON.stringify(res.data);
+          this.$message.success(res.data[1].realName);
         })
         .catch((err) => {
+          if (err.response.status === 403)
+          {
+            this.$message.warning("非法用户");
+          }
+          if (err.response.status === 401)
+          {
+            this.$message.warning("用户认证过期");
+          }
           console.error(err);
         });
     },
