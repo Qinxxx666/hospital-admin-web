@@ -122,7 +122,6 @@ const actions = {
       }
     });
     if (res.data.code === 200) {
-      console.log(res.data.msg)
       return true;
     }
     if (res.data.code === 403) {

@@ -15,6 +15,12 @@ export default [
         component: () => import('@/pages/hospital/roleManage/index.vue'),
         meta: { title: '角色管理页' },
       },
+      {
+        path: 'userManage',
+        name: 'UserManage',
+        component: () => import('@/pages/userManage/index.vue'),
+        meta: {title: '用户管理页'}
+      },
     ],
   },
   {
