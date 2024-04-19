@@ -46,7 +46,7 @@
               <template #icon>
                 <user-circle-icon class="header-user-avatar" />
               </template>
-              <div class="header-user-account">Tencent</div>
+              <div class="header-user-account">{{$store.state.user.userInfo.realName === "" ? $store.state.user.userInfo.name : $store.state.user.userInfo.realName}}</div>
               <template #suffix>
                 <chevron-down-icon />
               </template>

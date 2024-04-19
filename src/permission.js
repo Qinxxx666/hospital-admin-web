@@ -3,9 +3,8 @@ import 'nprogress/nprogress.css'; // progress bar style
 
 import store from '@/store';
 import router from '@/router';
-import request from "@/utils/request";
 
-NProgress.configure({ showSpinner: false });
+NProgress.configure({showSpinner: false});
 
 const whiteListRouters = store.getters['permission/whiteListRouters'];
 
@@ -13,13 +12,11 @@ router.beforeEach(async (to, from, next) => {
   NProgress.start();
 
 
-
   const token = store.getters['user/token'];
 
   if (token) {
     const res = await store.dispatch('user/checkTokenExpiration', token);
-    if (!res)
-    {
+    if (!res) {
       next(`/login?redirect=${to.path}`);
       return;
     }
@@ -42,7 +39,7 @@ router.beforeEach(async (to, from, next) => {
 
         await store.dispatch('permission/initRoutes', store.getters['user/roles']);
 
-        next({ ...to });
+        next({...to});
       } catch (error) {
         await store.commit('user/removeToken');
         next(`/login?redirect=${to.path}`);

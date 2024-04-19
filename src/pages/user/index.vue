@@ -3,16 +3,16 @@
     <t-col :flex="3">
       <div class="user-left-greeting">
         <div>
-          Hi，Image
-          <span class="regular"> 下午好，今天是你加入鹅厂的第 100 天～</span>
+          Hi，{{ $store.state.user.userInfo.realName === "" ? $store.state.user.userInfo.name : $store.state.user.userInfo.realName }}
+          <span class="regular"> 下午好，今天是你加入地球的第 100 天～</span>
         </div>
-        <img src="@/assets/assets-tencent-logo.png" class="logo" />
+        <img src="@/assets/assets-tencent-logo.png" class="logo"/>
       </div>
 
       <t-card class="user-info-list" title="个人信息" :bordered="false">
         <template #option>
           <t-button theme="default" shape="square" variant="text">
-            <edit-icon size="18" />
+            <edit-icon size="18"/>
           </t-button>
         </template>
         <t-row class="content" justify="space-between">
@@ -43,7 +43,7 @@
                   @change="onLineChange"
                 />
               </template>
-              <div id="lineContainer" style="width: 100%; height: 330px" />
+              <div id="lineContainer" style="width: 100%; height: 330px"/>
             </t-card>
           </t-tab-panel>
           <t-tab-panel value="third" label="内容列表">
@@ -56,19 +56,21 @@
     <t-col :flex="1">
       <t-card class="user-intro" :bordered="false">
         <t-avatar size="90px">T</t-avatar>
-        <div class="name">My Account</div>
-        <div class="position">XXG 港澳业务拓展组员工 直客销售</div>
+        <div class="name">
+          {{ $store.state.user.userInfo.realName === "" ? $store.state.user.userInfo.name : $store.state.user.userInfo.realName }}
+        </div>
+        <div class="position">员工</div>
       </t-card>
 
       <t-card title="团队成员" class="user-team" :bordered="false">
         <template #option>
           <t-button theme="default" shape="square" variant="text">
-            <edit-icon size="18" />
+            <edit-icon size="18"/>
           </t-button>
         </template>
         <t-list :split="false">
           <t-list-item v-for="(item, index) in TEAM_MEMBERS" :key="index">
-            <t-list-item-meta :image="item.avatar" :title="item.title" :description="item.description" />
+            <t-list-item-meta :image="item.avatar" :title="item.title" :description="item.description"/>
           </t-list-item>
         </t-list>
       </t-card>
@@ -76,21 +78,21 @@
       <t-card title="服务产品" class="product-container" :bordered="false">
         <template #option>
           <t-button theme="default" shape="square" variant="text">
-            <edit-icon size="18" />
+            <edit-icon size="18"/>
           </t-button>
         </template>
         <t-row class="content" :getters="16">
           <t-col :span="3">
-            <product-a-icon />
+            <product-a-icon/>
           </t-col>
           <t-col :span="3">
-            <product-b-icon />
+            <product-b-icon/>
           </t-col>
           <t-col :span="3">
-            <product-c-icon />
+            <product-c-icon/>
           </t-col>
           <t-col :span="3">
-            <product-d-icon />
+            <product-d-icon/>
           </t-col>
         </t-row>
       </t-card>
@@ -98,19 +100,19 @@
   </t-row>
 </template>
 <script>
-import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
-import { LineChart } from 'echarts/charts';
-import { CanvasRenderer } from 'echarts/renderers';
+import {GridComponent, TooltipComponent, LegendComponent} from 'echarts/components';
+import {LineChart} from 'echarts/charts';
+import {CanvasRenderer} from 'echarts/renderers';
 import * as echarts from 'echarts/core';
-import { EditIcon } from 'tdesign-icons-vue';
+import {EditIcon} from 'tdesign-icons-vue';
 
-import { mapState } from 'vuex';
+import {mapState} from 'vuex';
 
-import { getFolderLineDataSet } from './index';
-import { changeChartsTheme } from '@/utils/color';
-import { LAST_7_DAYS } from '@/utils/date';
+import {getFolderLineDataSet} from './index';
+import {changeChartsTheme} from '@/utils/color';
+import {LAST_7_DAYS} from '@/utils/date';
 
-import { USER_INFO_LIST, TEAM_MEMBERS, PRODUCT_LIST } from '@/service/service-user';
+import {USER_INFO_LIST, TEAM_MEMBERS, PRODUCT_LIST} from '@/service/service-user';
 import ProductAIcon from '@/assets/assets-product-1.svg';
 import ProductBIcon from '@/assets/assets-product-2.svg';
 import ProductCIcon from '@/assets/assets-product-3.svg';
@@ -163,7 +165,7 @@ export default {
   methods: {
     /** 图表选择 */
     onLineChange(value) {
-      this.lineChart.setOption(getFolderLineDataSet({ dateTime: value }));
+      this.lineChart.setOption(getFolderLineDataSet({dateTime: value}));
     },
     updateContainer() {
       this.lineChart.resize?.({
@@ -172,7 +174,7 @@ export default {
       });
     },
     renderCharts() {
-      const { chartColors } = this.$store.state.setting;
+      const {chartColors} = this.$store.state.setting;
       if (!this.lineContainer) {
         this.lineContainer = document.getElementById('lineContainer');
       }
@@ -184,7 +186,7 @@ export default {
           x2: 10, // 默认80px
           y2: 30, // 默认60px
         },
-        ...getFolderLineDataSet({ ...chartColors }),
+        ...getFolderLineDataSet({...chartColors}),
       });
     },
     getIcon(type) {

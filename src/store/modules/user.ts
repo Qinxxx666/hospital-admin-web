@@ -69,19 +69,45 @@ const actions = {
   },
   async getUserInfo({commit, state}) {
     const mockRemoteUserInfo = async (token) => {
-      if (token === 'main_token') {
+      // 获取用户信息请求流程
+      const res = await request.request({
+        method: 'get',
+        url: '/user/userInfo',
+        headers: {
+          'Authorization': token
+        },
+        timeout: 3000
+      })
+      if (res.data.code !== 200)
+      {
         return {
-          name: 'td_main',
-          roles: ['ALL_ROUTERS'],
-        };
+          name: res.data.msg,
+          roles: []
+        }
       }
       return {
-        name: 'td_dev',
+        name: res.data.data.userName,
+        sex: res.data.data.sex,
+        age: res.data.data.age,
+        realName: res.data.data.realName,
+        phoneNumber: res.data.data.phoneNumber,
+        email: res.data.data.email,
+        avatar: res.data.data.avatar,
         roles: ['ALL_ROUTERS'],
-      };
+      }
+
+      // if (token === 'main_token') {
+      //   return {
+      //     name: 'td_main',
+      //     roles: ['ALL_ROUTERS'],
+      //   };
+      // }
+      // return {
+      //   name: 'td_dev',
+      //   roles: ['ALL_ROUTERS'],
+      // };
     };
     const res = await mockRemoteUserInfo(state.token);
-
     commit('setUserInfo', res);
   },
   async logout({commit}) {
@@ -101,10 +127,12 @@ const actions = {
     }
     if (res.data.code === 403) {
       commit('removeToken')
+      commit('setUserInfo', InitUserInfo);
       return false;
     }
     if (res.data.code === 401) {
       commit('removeToken')
+      commit('setUserInfo', InitUserInfo);
       return false;
     }
     return false;
