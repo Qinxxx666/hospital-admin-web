@@ -9,7 +9,7 @@
           </template>
         </t-input>
         <t-button>查询</t-button>
-        <t-button variant="outline">新增</t-button>
+        <t-button variant="outline" @click="() => this.$router.push({name: 'UserForm'})">新增</t-button>
       </t-space>
       <t-table
         :columns="columns"
@@ -27,14 +27,15 @@
 </template>
 
 <script lang="jsx">
-import {SearchIcon,
+import {
+  SearchIcon,
   CheckCircleFilledIcon,
   CloseCircleFilledIcon
 } from 'tdesign-icons-vue';
 
 const initData = [];
 const initColumn = [
-  {title: '序号', colKey: 'col', width: 60, align: 'center', cell: (h, {rowIndex }) => rowIndex + 1},
+  {title: '序号', colKey: 'col', width: 60, align: 'center', cell: (h, {rowIndex}) => rowIndex + 1},
   {title: '姓名', colKey: 'realName', ellipsis: true, align: 'center'},
   {title: '职位', colKey: 'role', ellipsis: true, align: 'center'},
   {title: '部门', colKey: 'department', ellipsis: true, align: 'center'},
@@ -56,7 +57,7 @@ const initColumn = [
   {
     title: '是否允许登录', colKey: 'enabledLogin', ellipsis: true, align: 'center', cell: (h, {row}) => {
       const enabledLoginMap = {
-        "0": {label: '拒绝登录', theme: 'danger', icon: <CloseCircleFilledIcon />},
+        "0": {label: '拒绝登录', theme: 'danger', icon: <CloseCircleFilledIcon/>},
         "1": {label: '允许登录', theme: 'success', icon: <CheckCircleFilledIcon/>}
       };
       if (row.enabledLogin === null || row.enabledLogin === undefined) {
@@ -71,7 +72,7 @@ const initColumn = [
   {title: '头像', colKey: 'avatar', ellipsis: true, align: 'center'}];
 export default {
   components: {
-    SearchIcon
+    SearchIcon,
   },
   data() {
     return {
@@ -80,6 +81,8 @@ export default {
       bordered: true,
       columns: initColumn,
       tableLayout: 'fixed',
+      dialogHeader: "新增",
+      visible: false,
     }
   },
   created() {
@@ -95,7 +98,7 @@ export default {
         return;
       }
       this.data = res.data;
-    }
+    },
   }
 }
 </script>

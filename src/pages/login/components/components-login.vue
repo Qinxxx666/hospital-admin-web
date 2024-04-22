@@ -75,8 +75,8 @@
       <t-button
                 block size="large" type="submit"> 登录 </t-button>
 
-      <t-button @click="requestGet"
-                block size="large"> 获取用户信息 </t-button>
+<!--      <t-button @click="requestGet"-->
+<!--                block size="large"> 获取用户信息 </t-button>-->
     </t-form-item>
 
     <div class="switch-container">
