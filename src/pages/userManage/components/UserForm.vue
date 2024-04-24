@@ -17,6 +17,12 @@
           <t-radio value="0">女</t-radio>
         </t-radio-group>
       </t-form-item>
+      <t-form-item label="是否允许登录" name="enabledLogin">
+        <t-radio-group v-model="formData.enabledLogin">
+          <t-radio value="1">允许</t-radio>
+          <t-radio value="0">不允许</t-radio>
+        </t-radio-group>
+      </t-form-item>
       <t-form-item label="联系方式" name="phoneNumber">
         <t-input v-model="formData.phoneNumber" placeholder="请输入联系方式"/>
       </t-form-item>
@@ -26,12 +32,13 @@
       <t-form-item label="头像" name="avatar">
         <t-upload
           ref="uploadRef2"
-          action="http://localhost:8080/file/upload"
+          action=""
+          :multiple="false"
+          v-model="formData.avatarFile"
           :disabled="false"
           :autoUpload="false"
           theme="image"
-          :formatResponse="formatResponse"
-          tips="请选择头像"
+          tips="大小在10MB以内，支持JPG、PNG、JPEG格式"
           accept="image/*"
           :showImageFileName="true"
 
@@ -51,15 +58,18 @@
 <script lang="ts">
 
 const INITIAL_DATA = {
-  name: '',
+  userName: '',
   email: '',
-  phone: '',
+  realName: '',
   password: '',
+  phoneNumber: '',
+  enabledLogin: '0',
+  age: null,
   role: '',
-  status: '',
   sex: '1',
-  avatar: [],
+  avatarFile: [],
 }
+
 export default {
   name: 'UserForm',
   data() {
@@ -84,15 +94,14 @@ export default {
     onReset() {
       this.formData = INITIAL_DATA;
     },
-    onSubmit() {
-      this.$message.success('提交成功');
+    async onSubmit() {
+      const res = await this.$store.dispatch('userManage/addUser', this.formData);
+      if (res.code === 200) {
+        this.$router.push('/hospital/success');
+      } else {
+        this.$message.error(res.msg);
+      }
     },
-    handleFail({file}){
-      this.$message.error(`文件 ${file.name} 上传失败`);
-    },
-    formatResponse(){
-
-    }
   },
 }
 </script>

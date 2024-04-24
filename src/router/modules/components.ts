@@ -26,6 +26,12 @@ export default [
         name: 'UserForm',
         component: () => import('@/pages/userManage/components/UserForm.vue'),
         meta: {title: '用户添加', hidden: true},
+      },
+      {
+        path: 'success',
+        name: 'UserAddSuccess',
+        component: () => import('@/pages/userManage/components/success.vue'),
+        meta: {title: '添加成功', hidden: true},
       }
     ],
   },

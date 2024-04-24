@@ -69,7 +69,10 @@ const initColumn = [
       </t-tag>;
     }
   },
-  {title: '头像', colKey: 'avatar', ellipsis: true, align: 'center'}];
+  {
+    title: '头像', colKey: 'avatar', ellipsis: true, align: 'center',
+    cell: (h, {row}) => <t-avatar image={row.avatar} shape="round" >{row.userName}</t-avatar>
+  }];
 export default {
   components: {
     SearchIcon,
