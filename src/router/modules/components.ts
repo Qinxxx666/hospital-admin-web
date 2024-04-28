@@ -1,6 +1,5 @@
 import {ViewModuleIcon, Edit1Icon, LayersIcon, } from 'tdesign-icons-vue';
 import Layout from '@/layouts/index.vue';
-import Building from '@/pages/result/building/index.vue'
 
 export default [
   {
@@ -36,26 +35,7 @@ export default [
       }
     ],
   },
-  {
-    path: '/baseData',
-    name: 'baseData',
-    meta: {title: '基础数据', icon: 'setting-1'},
-    component: Layout,
-    children: [
-      {
-        path: 'role',
-        name: 'role',
-        component: Building,
-        meta: {title: '职称管理', icon: 'member'},
-      },
-      {
-        path: 'section',
-        name: 'section',
-        component: Building,
-        meta: {title: '科室管理', icon: 'city-8'},
-      }
-    ]
-  }
+
   // {
   //   path: '/list',
   //   name: 'list',
