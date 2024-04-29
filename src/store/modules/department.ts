@@ -24,6 +24,18 @@ const actions = {
       console.log(e)
       throw e;
     }
+  },
+  async getDepartmentUsers({state},id){
+    try {
+      const  res = await request.request({
+        url: `/department/user/list/${id}`,
+        method: "get",
+      });
+      return res.data;
+    }catch (e) {
+      console.log(e)
+      throw e;
+    }
   }
 };
 export default {
