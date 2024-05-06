@@ -14,12 +14,12 @@
 <script lang="ts">
 
 export default {
-  methods: {
-  },
   props: {
     UserInfoData: {
       type: Object,
     }
+  },
+  methods: {
   },
 }
 </script>

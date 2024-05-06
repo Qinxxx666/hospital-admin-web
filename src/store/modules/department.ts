@@ -1,4 +1,5 @@
 import request from "@/utils/request";
+import {TOKEN_NAME} from "@/config/global";
 
 const actions = {
   async getDepartmentList() {
@@ -13,32 +14,73 @@ const actions = {
       throw error;
     }
   },
-  async getDepartmentInfoById({state},id){
+  async getDepartmentInfoById({state}, id) {
     try {
       const res = await request.request({
         url: `/department/info/${id}`,
         method: "get",
+        headers: {
+          Authorization: localStorage.getItem(TOKEN_NAME),
+        },
       });
       return res.data;
-    }catch (e) {
+    } catch (e) {
       console.log(e)
       throw e;
     }
   },
   async getDepartmentUsers({state},id){
     try {
-      const  res = await request.request({
+      const res = await request.request({
         url: `/department/user/list/${id}`,
         method: "get",
+        headers: {
+          Authorization: localStorage.getItem(TOKEN_NAME),
+        },
       });
       return res.data;
-    }catch (e) {
+    } catch (e) {
+      console.log(e)
+      throw e;
+    }
+  },
+  async addDepartment({state}, params) {
+    try {
+      const res = await request.request({
+        url: "/department/add",
+        method: "post",
+        data: params,
+        headers: {
+          Authorization: localStorage.getItem(TOKEN_NAME),
+          'content-type': 'application/x-www-form-urlencoded'
+        },
+      });
+      return res.data;
+    } catch (e) {
+      console.log(e)
+      throw e;
+    }
+  },
+
+  async deleteDepartment({state}, ids) {
+    try {
+      const res = await request.request({
+        url: '/department/delete/',
+        method: "post",
+        data: ids,
+        headers: {
+          'content-type': 'application/json',
+          Authorization: localStorage.getItem(TOKEN_NAME),
+        },
+      })
+      return res.data;
+    } catch (e) {
       console.log(e)
       throw e;
     }
   }
-};
+}
 export default {
-  namespace: true,
+  namespaced: true,
   actions
 }

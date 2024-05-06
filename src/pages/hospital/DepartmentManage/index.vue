@@ -4,11 +4,24 @@
       <t-col :span="3">
         <div class="tree-container">
           <t-space>
-            <t-button theme="primary" size="small" variant="dashed">新增</t-button>
-            <t-button theme="warning" size="small" variant="dashed">修改</t-button>
-            <t-button theme="danger" size="small" variant="dashed">删除</t-button>
+            <t-button theme="default" variant="outline" size="small" @click="addDepRoot">添加顶级节点</t-button>
           </t-space>
-          <t-tree :data="items" @click="onClick" :activable="isActive"/>
+          <t-tree :data="items" @click="onClick" :activable="isActive">
+            <template #operations="{ node }">
+              <t-tooltip content="添加">
+                <t-button shape="circle" theme="success" variant="text" @click="addNode(node)">
+                  <add-icon style="color: #2ba471"/>
+                </t-button>
+              </t-tooltip>
+              <t-tooltip content="删除">
+                <t-button shape="circle" theme="danger" variant="text" @click="delDepartment(node)">
+                  <delete-icon style="color: #d54941"/>
+                </t-button>
+              </t-tooltip>
+            </template>
+          </t-tree>
+          <add-department :isVisible="addDialog" :departmentInfo="parentDepartmentInfo"
+                          @closeDialog="controlAddDialog" @confirm="handleConfirm"/>
         </div>
       </t-col>
       <t-col :span="9">
@@ -74,11 +87,14 @@
               confirm-btn="关闭">
       <user-info :user-info-data="userInfo"/>
     </t-dialog>
+    <del-department :visibleDel="delDialog" :delMessage="delMessageStr" @close="closeDelDialog" @confirm="confirmDel"/>
   </div>
 </template>
 <script lang="ts">
-import {BrowseIcon} from 'tdesign-icons-vue';
+import {BrowseIcon, AddIcon, DeleteIcon} from 'tdesign-icons-vue';
 import UserInfo from "@/pages/hospital/DepartmentManage/components/userInfo.vue";
+import AddDepartment from "@/pages/hospital/DepartmentManage/components/addDepartment.vue";
+import DelDepartment from "@/pages/hospital/DepartmentManage/components/delDepartment.vue";
 
 const descriptionsData = [
   {code: ""},
@@ -114,7 +130,7 @@ const INITIALIZE_COLUMNS = [
 ];
 
 export default {
-  components: {UserInfo, BrowseIcon},
+  components: {UserInfo, BrowseIcon, AddIcon, DeleteIcon, AddDepartment, DelDepartment},
   data() {
     return {
       title: "科室信息",
@@ -126,6 +142,11 @@ export default {
       displayColumns: ['col', 'realName', 'age', 'sex', 'phoneNumber', 'diploma', 'profession', 'operation'],
       userInfo: {},
       isVisible: false,
+      addDialog: false,
+      delDialog: false,
+      delMessageStr: '',
+      delDepartmentIds: [],
+      parentDepartmentInfo: {},
     }
   },
   created() {
@@ -135,33 +156,96 @@ export default {
   },
   methods: {
     initTree() {
-      this.$store.dispatch("getDepartmentList").then((res) => {
+      this.items = [];
+      this.$store.dispatch("department/getDepartmentList").then((res) => {
         this.items = res.data
       }).catch((err) => {
         this.$message("error", err.message);
       })
     },
-
     onClick(obj) {
-      this.$store.dispatch("getDepartmentInfoById", obj.node.value).then((res) => {
-        console.log("数据：", res.data)
+      this.$store.dispatch("department/getDepartmentInfoById", obj.node.value).then((res) => {
         this.descriptions = res.data;
       }).catch((err) => {
         this.$message("error", err.message);
       });
-      this.$store.dispatch("getDepartmentUsers", obj.node.value).then((res) => {
+      this.$store.dispatch("department/getDepartmentUsers", obj.node.value).then((res) => {
         this.tableData = res.data;
       }).catch((err) => {
         this.$message("error", err.message);
       })
     },
     openDetail(row) {
-      console.log(row)
       this.userInfo = row;
       this.isVisible = true;
     },
     closeDialog() {
       this.isVisible = false;
+    },
+    addNode(obj) {
+      this.addDialog = true;
+      this.parentDepartmentInfo.name = obj.label;
+      this.parentDepartmentInfo.id = obj.value;
+    },
+    controlAddDialog(param) {
+      this.addDialog = param;
+    },
+    handleConfirm(formData) {
+      this.$store.dispatch("department/addDepartment", formData).then(res => {
+        if (res.code === 200) {
+          this.$notify.success({title: "提示", content: "添加成功", closeBtn: true});
+          this.addDialog = false;
+          this.initTree();
+        } else {
+          this.$notify.error({title: "提示", content: "添加失败", closeBtn: true});
+        }
+      }).catch(e => {
+        this.$notify.error({title: "提示", content: `系统出现异常：${e}`, closeBtn: true});
+      }).finally(() => {
+        this.parentDepartmentInfo = {};
+      })
+    },
+    delDepartment(node) {
+      const children = node.getChildren();
+      this.delDepartmentIds.push(node.data.value)
+      if (children !== false) {
+        this.getChildrenId(node.data.children);
+        this.delMessageStr = "是否删除该科室及其下所有子科室？";
+
+      } else {
+        this.delMessageStr = "是否删除该科室？";
+      }
+      this.delDialog = true;
+    },
+    closeDelDialog() {
+      this.delDepartmentIds = [];
+      this.delDialog = false;
+    },
+    confirmDel() {
+      this.$store.dispatch("department/deleteDepartment", this.delDepartmentIds).then(res => {
+        if (res.code === 200) {
+          this.$notify.success({title: "提示", content: "删除成功", closeBtn: true});
+          this.initTree();
+          this.delDialog = false;
+        } else {
+          this.$notify.error({title: "提示", content: "删除失败", closeBtn: true});
+        }
+      }).catch(e => {
+        this.$notify.error({title: "提示", content: `系统出现异常：${e}`, closeBtn: true});
+      }).finally(() => {
+        this.delDepartmentIds = [];
+      })
+    },
+    getChildrenId(children) {
+      if (children === null) return;
+      for (let i = 0; i < children.length; i++) {
+        this.delDepartmentIds.push(children[i].value)
+        this.getChildrenId(children[i].children);
+      }
+    },
+    addDepRoot() {
+      this.addDialog = true;
+      this.parentDepartmentInfo = {}
     }
   },
 }
