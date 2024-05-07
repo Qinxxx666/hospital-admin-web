@@ -66,6 +66,13 @@
         </div>
 
         <div class="table-container">
+          <t-space>
+            <t-tooltip content="添加人员">
+              <t-button theme="default" variant="text" size="medium" @click="openAddUserDialog">
+                <user-add-icon/>
+              </t-button>
+            </t-tooltip>
+          </t-space>
           <t-table :columns="columnsData" :display-columns="displayColumns" :data="tableData" :row-key="tableData.id">
             <template #operation="{ row }">
               <t-tooltip content="查看详情" placement="bottom">
@@ -88,13 +95,16 @@
       <user-info :user-info-data="userInfo"/>
     </t-dialog>
     <del-department :visibleDel="delDialog" :delMessage="delMessageStr" @close="closeDelDialog" @confirm="confirmDel"/>
+    <user-list :departmentUserDialogVisible="addUserDialog" @closeDialog="addUserDialog = false"
+               :departmentInfo="parentDepartmentInfo" @save="addUserSave"/>
   </div>
 </template>
 <script lang="ts">
-import {BrowseIcon, AddIcon, DeleteIcon} from 'tdesign-icons-vue';
+import {BrowseIcon, AddIcon, DeleteIcon, UserAddIcon} from 'tdesign-icons-vue';
 import UserInfo from "@/pages/hospital/DepartmentManage/components/userInfo.vue";
 import AddDepartment from "@/pages/hospital/DepartmentManage/components/addDepartment.vue";
 import DelDepartment from "@/pages/hospital/DepartmentManage/components/delDepartment.vue";
+import UserList from "@/pages/hospital/DepartmentManage/components/addUserDepartment.vue";
 
 const descriptionsData = [
   {code: ""},
@@ -130,7 +140,7 @@ const INITIALIZE_COLUMNS = [
 ];
 
 export default {
-  components: {UserInfo, BrowseIcon, AddIcon, DeleteIcon, AddDepartment, DelDepartment},
+  components: {UserInfo, BrowseIcon, AddIcon, DeleteIcon, AddDepartment, DelDepartment, UserAddIcon, UserList},
   data() {
     return {
       title: "科室信息",
@@ -147,6 +157,7 @@ export default {
       delMessageStr: '',
       delDepartmentIds: [],
       parentDepartmentInfo: {},
+      addUserDialog: false,
     }
   },
   created() {
@@ -164,6 +175,8 @@ export default {
       })
     },
     onClick(obj) {
+      this.parentDepartmentInfo.name = obj.node.label;
+      this.parentDepartmentInfo.id = obj.node.value;
       this.$store.dispatch("department/getDepartmentInfoById", obj.node.value).then((res) => {
         this.descriptions = res.data;
       }).catch((err) => {
@@ -182,10 +195,8 @@ export default {
     closeDialog() {
       this.isVisible = false;
     },
-    addNode(obj) {
+    addNode() {
       this.addDialog = true;
-      this.parentDepartmentInfo.name = obj.label;
-      this.parentDepartmentInfo.id = obj.value;
     },
     controlAddDialog(param) {
       this.addDialog = param;
@@ -246,6 +257,34 @@ export default {
     addDepRoot() {
       this.addDialog = true;
       this.parentDepartmentInfo = {}
+    },
+    openAddUserDialog() {
+      if (this.parentDepartmentInfo.id === undefined) {
+        this.$notify.warning({title: "提示", content: "请先选择一个科室", closeBtn: true});
+        return;
+      }
+      this.addUserDialog = true;
+    },
+    addUserSave(userIds) {
+      const params = {
+        departmentId: this.parentDepartmentInfo.id,
+        userIdList: userIds
+      };
+      this.$store.dispatch('department/addUserList', params).then(res => {
+        if (res.code === 200) {
+          this.$notify.success({title: "提示", content: "添加成功", closeBtn: true});
+          this.addUserDialog = false;
+          this.$store.dispatch("department/getDepartmentUsers", params.departmentId).then((res) => {
+            this.tableData = res.data;
+          }).catch((err) => {
+            this.$message("error", err.message);
+          })
+        } else {
+          this.$notify.error({title: "提示", content: "添加失败", closeBtn: true});
+        }
+      }).catch(e => {
+        this.$notify.error({title: "提示", content: `系统出现异常：${e}`, closeBtn: true});
+      })
     }
   },
 }

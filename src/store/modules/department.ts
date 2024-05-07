@@ -29,7 +29,7 @@ const actions = {
       throw e;
     }
   },
-  async getDepartmentUsers({state},id){
+  async getDepartmentUsers({state}, id) {
     try {
       const res = await request.request({
         url: `/department/user/list/${id}`,
@@ -78,7 +78,41 @@ const actions = {
       console.log(e)
       throw e;
     }
-  }
+  },
+
+  async getUserList({state}, id) {
+    try {
+      const res = await request.request({
+        url: `/department/getUserList/${id}`,
+        method: "get",
+        headers: {
+          Authorization: localStorage.getItem(TOKEN_NAME)
+        }
+      });
+      return res.data;
+    } catch (e) {
+      console.log(e)
+      throw e;
+    }
+
+  },
+  async addUserList({state}, params) {
+    console.log(params)
+    try {
+      const res = await request.request({
+        url: `/department/addUser`,
+        method: "post",
+        data: params,
+        headers: {
+          Authorization: localStorage.getItem(TOKEN_NAME)
+        }
+      });
+      return res.data;
+    } catch (e) {
+      console.log(e)
+      throw e;
+    }
+  },
 }
 export default {
   namespaced: true,

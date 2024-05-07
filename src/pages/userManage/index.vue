@@ -8,7 +8,7 @@
             <search-icon :style="{ cursor: 'pointer' }"/>
           </template>
         </t-input>
-        <t-button>查询</t-button>
+        <t-button @click="initDataFun">查询</t-button>
         <t-button variant="outline" @click="() => this.$router.push({name: 'UserForm'})">新增</t-button>
       </t-space>
       <t-table
