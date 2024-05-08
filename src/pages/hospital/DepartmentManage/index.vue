@@ -75,11 +75,19 @@
           </t-space>
           <t-table :columns="columnsData" :display-columns="displayColumns" :data="tableData" :row-key="tableData.id">
             <template #operation="{ row }">
-              <t-tooltip content="查看详情" placement="bottom">
-                <t-button shape="circle" theme="primary" variant="text" @click="openDetail(row)">
-                  <browse-icon/>
-                </t-button>
-              </t-tooltip>
+              <t-space :size="2">
+                <t-tooltip content="查看详情" placement="bottom">
+                  <t-button shape="circle" size="small" theme="primary" variant="text" @click="openDetail(row)">
+                    <browse-icon/>
+                  </t-button>
+                </t-tooltip>
+                <t-tooltip content="移除人员" placement="bottom">
+                  <t-button shape="circle" size="small" theme="danger" variant="text" @click="removeUser(row)">
+                    <delete-icon/>
+                  </t-button>
+                </t-tooltip>
+              </t-space>
+
             </template>
           </t-table>
         </div>
@@ -155,7 +163,8 @@ export default {
       addDialog: false,
       delDialog: false,
       delMessageStr: '',
-      delDepartmentIds: [],
+      childDepartmentIds: [],
+      parentsDepartmentIds: [],
       parentDepartmentInfo: {},
       addUserDialog: false,
     }
@@ -175,8 +184,22 @@ export default {
       })
     },
     onClick(obj) {
+      this.parentDepartmentInfo = {};
       this.parentDepartmentInfo.name = obj.node.label;
       this.parentDepartmentInfo.id = obj.node.value;
+      // 获取选择节点所有子科室信息包括自己
+      this.childDepartmentIds = [];
+      this.childDepartmentIds.push(obj.node.value);
+      // 获取选择节点所有父科室信息包括自己
+      this.parentsDepartmentIds = [];
+      this.parentsDepartmentIds.push(obj.node.value)
+      const parents = obj.node.getParents();
+      if (parents.length > 0) {
+        parents.forEach(parent => {
+          this.parentsDepartmentIds.push(parent.value);
+        });
+      }
+      this.getChildrenId(obj.node.data.children);
       this.$store.dispatch("department/getDepartmentInfoById", obj.node.value).then((res) => {
         this.descriptions = res.data;
       }).catch((err) => {
@@ -191,6 +214,41 @@ export default {
     openDetail(row) {
       this.userInfo = row;
       this.isVisible = true;
+    },
+    removeUser(row) {
+      const confirmDia = this.$dialog.confirm({
+        header: '提示',
+        theme: 'warning',
+        body: '你确定要删除该项么？',
+        confirmBtn: '确定',
+        cancelBtn: '取消',
+        onConfirm: () => {
+          const allDepartment = [...this.parentsDepartmentIds, ...this.childDepartmentIds];
+          const params = {
+            departmentId: Array.from(new Set(allDepartment)),
+            userId: row.id
+          }
+          this.$store.dispatch("department/removeUser", params).then(res => {
+            if (res.code === 200) {
+              this.$notify.success({title: "提示", content: "移除成功", closeBtn: true});
+              // 请求成功后，销毁弹框
+              confirmDia.destroy();
+              this.$store.dispatch("department/getDepartmentUsers", this.parentDepartmentInfo.id).then((res) => {
+                this.tableData = res.data;
+              }).catch((err) => {
+                this.$message("error", err.message);
+              });
+            } else {
+              this.$notify.error({title: "提示", content: "移除失败", closeBtn: true});
+            }
+          }).catch(e => {
+            this.$notify.error({title: "提示", content: `系统出现异常：${e}`, closeBtn: true});
+          })
+        },
+        onClose: () => {
+          confirmDia.hide();
+        },
+      });
     },
     closeDialog() {
       this.isVisible = false;
@@ -218,9 +276,7 @@ export default {
     },
     delDepartment(node) {
       const children = node.getChildren();
-      this.delDepartmentIds.push(node.data.value)
       if (children !== false) {
-        this.getChildrenId(node.data.children);
         this.delMessageStr = "是否删除该科室及其下所有子科室？";
 
       } else {
@@ -229,11 +285,10 @@ export default {
       this.delDialog = true;
     },
     closeDelDialog() {
-      this.delDepartmentIds = [];
       this.delDialog = false;
     },
     confirmDel() {
-      this.$store.dispatch("department/deleteDepartment", this.delDepartmentIds).then(res => {
+      this.$store.dispatch("department/deleteDepartment", this.childDepartmentIds).then(res => {
         if (res.code === 200) {
           this.$notify.success({title: "提示", content: "删除成功", closeBtn: true});
           this.initTree();
@@ -244,13 +299,13 @@ export default {
       }).catch(e => {
         this.$notify.error({title: "提示", content: `系统出现异常：${e}`, closeBtn: true});
       }).finally(() => {
-        this.delDepartmentIds = [];
+        this.childDepartmentIds = [];
       })
     },
     getChildrenId(children) {
       if (children === null) return;
       for (let i = 0; i < children.length; i++) {
-        this.delDepartmentIds.push(children[i].value)
+        this.childDepartmentIds.push(children[i].value)
         this.getChildrenId(children[i].children);
       }
     },
@@ -267,14 +322,14 @@ export default {
     },
     addUserSave(userIds) {
       const params = {
-        departmentId: this.parentDepartmentInfo.id,
+        departmentListId: this.parentsDepartmentIds,
         userIdList: userIds
       };
       this.$store.dispatch('department/addUserList', params).then(res => {
         if (res.code === 200) {
           this.$notify.success({title: "提示", content: "添加成功", closeBtn: true});
           this.addUserDialog = false;
-          this.$store.dispatch("department/getDepartmentUsers", params.departmentId).then((res) => {
+          this.$store.dispatch("department/getDepartmentUsers", this.parentDepartmentInfo.id).then((res) => {
             this.tableData = res.data;
           }).catch((err) => {
             this.$message("error", err.message);

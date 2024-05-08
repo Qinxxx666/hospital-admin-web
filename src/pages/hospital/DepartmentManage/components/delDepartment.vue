@@ -1,5 +1,6 @@
 <template>
-  <t-dialog header="提示" :visible="visibleDel" :body="delMessage" @close="closeDialog" @confirm="confirmDialog">
+  <t-dialog header="提示" theme="warning" :visible="visibleDel" :body="delMessage" @close="closeDialog"
+            @confirm="confirmDialog">
 
   </t-dialog>
 </template>
@@ -17,10 +18,10 @@ export default ({
     }
   },
   methods: {
-    closeDialog(){
+    closeDialog() {
       this.$emit('close');
     },
-    confirmDialog(){
+    confirmDialog() {
       this.$emit('confirm');
     }
   }

@@ -97,7 +97,6 @@ const actions = {
 
   },
   async addUserList({state}, params) {
-    console.log(params)
     try {
       const res = await request.request({
         url: `/department/addUser`,
@@ -113,6 +112,26 @@ const actions = {
       throw e;
     }
   },
+  async removeUser({state}, params) {
+    const {departmentId, userId} = params;
+    try {
+      const res = await request.request({
+        url: `/department/remove`,
+        method: "post",
+        params: {
+          userId
+        },
+        data: departmentId,
+        headers: {
+          Authorization: localStorage.getItem(TOKEN_NAME)
+        }
+      });
+      return res.data;
+    } catch (e) {
+      console.log(e)
+      throw e;
+    }
+  }
 }
 export default {
   namespaced: true,
